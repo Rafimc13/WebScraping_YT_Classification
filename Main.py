@@ -1,14 +1,22 @@
+import random
 import re
 import pandas as pd
 from Lang_Detector import LangDetect
 from Crawler_YT import Crawling_YT
 
+
 class Main:
 
     # Creating an instance of class LangDetect
     lang_det = LangDetect()
-
+    # Creating an instance of class Crawling_YT
     my_crawler = Crawling_YT()
+
+    def check_lang(self, video_titles, accepted_videos, lang_choices):
+
+
+        return accepted_videos
+
 
     # Reading a training dataset with sentences
     txt_file = 'dataset_sentences.txt'
@@ -39,14 +47,47 @@ class Main:
     # Saving our dataframe in a .html and a .csv file with the name gold
     dataset_df.to_html("gold.html")
     dataset_df.to_csv('gold.csv')
+
     # Comparison of ground truth with my classification via regexps
     my_accuracy = lang_det.comp_scores(dataset_df, 'language', 'ground_truth')
 
-    url_youtube = 'https://www.youtube.com/watch?v=ryE8V8iyH5c'
+    url_youtube = 'https://www.youtube.com/watch?v=b0z_dp5-luQ'
 
-    accepted_list = []
-    first_title = my_crawler.crawl_yt_title(url_youtube)
-    accepted_list.append({first_title: url_youtube})
-    accepted_list.append(my_crawler.crawl_next(url_youtube))
+    # Lets store 30 or more Greek/Greeklish titles and their posts
+    accepted_videos = {}
+    title1, comments1 = my_crawler.crawl_yt_title(url_youtube)
+    accepted_videos[title1] = url_youtube
+    check_next_videos = my_crawler.crawl_next(url_youtube)
+    sum = 0
+    loops = 0
+    while sum < 10:
+        loops += 1
+        for key, value in check_next_videos.items():
+            title_lang = lang_det.comp_languages(key, lang_choices)
+            if title_lang == lang_choices[0] or title_lang == lang_choices[1]:
+                accepted_videos[key] = value
+        sum = len(accepted_videos)
+        if loops < 10:
+            random_key = random.choice(list(check_next_videos.keys()))
+            random_url = check_next_videos[random_key]
+            check_next_videos = my_crawler.crawl_next(random_url)
+        else:
+            check_next_videos = my_crawler.crawl_next(url_youtube)
 
-    print(accepted_list)
+    comments_list = []
+    com_columns = []
+    comments_df = pd.DataFrame(columns=['comment', 'link'])
+    comments_df = comments_df.set_index('comment')
+
+    for key, value in accepted_videos.items():
+        title, comments = my_crawler.crawl_yt_title(value)
+        for comment in comments:
+            comments_df.loc[comment] = value
+
+    comments_df.to_csv('crawl.csv')
+
+
+
+
+
+

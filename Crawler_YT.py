@@ -1,54 +1,65 @@
-import re
-from bs4 import BeautifulSoup
+import time
+import requests
+from selenium.common import WebDriverException
 from selenium.webdriver import Edge
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from Lang_Detector import LangDetect
+from selenium.webdriver.common.keys import Keys
 
 
 class Crawling_YT:
 
     def crawl_yt_title(self, url):
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                with Edge() as driver:
+                    driver.get(url)
+                    wait = WebDriverWait(driver, 20)
+                    title = wait.until(
+                        EC.presence_of_element_located((By.XPATH, '//*[@id="title"]/h1/yt-formatted-string'))).text
+                    for _ in range(5):
+                        driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.END)
+                        time.sleep(2)
+                        comments = wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@id="comment-content"]')))
+                    comment_list = []
+                    for comment in comments:
+                        comment_list.append(comment.text)
 
-        with Edge() as driver:
-            driver.get(url)
-            wait = WebDriverWait(driver, 10)
-            title = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="title"]/h1/yt-formatted-string'))).text
+                return title, comment_list
+            else:
+                print(f"Problem with the connection. Status code: {response.status_code}")
+        except requests.RequestException as e:
+            print(f"An exception occurred while making the request: {e}")
 
-        return title
+        except WebDriverException as e:
+            print(f"An exception occurred with the WebDriver: {e}")
 
     def crawl_next(self, url):
+        my_dict = {}
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                with Edge() as driver:
+                    driver.get(url)
+                    wait = WebDriverWait(driver, 15)
+                    for _ in range(2):
+                        driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.END)
+                        time.sleep(2)
+                        next_titles = wait.until(
+                            EC.presence_of_all_elements_located((By.XPATH, '//*[@id="dismissible"]/div/div[1]/a/h3')))
+                        next_ids = wait.until(EC.presence_of_all_elements_located(
+                            (By.XPATH, '//*[@id="dismissible"]/div/div[1]/a')))
+                        for i in range(len(next_titles)):
+                            my_dict[next_titles[i].text] = next_ids[i].get_attribute('href')
 
-        lang_choices = ['greek', 'greeklish', 'english', 'other']
-        with Edge() as driver:
-            lang_det = LangDetect()
+                return my_dict
+            else:
+                print(f"Problem with the connection. Status code: {response.status_code}")
+        except requests.RequestException as e:
+            print(f"An exception occurred while making the request: {e}")
 
-            driver.get(url)
-            wait = WebDriverWait(driver, 15)
-
-            title_next = wait.until(EC.presence_of_element_located(
-                (By.XPATH, '//*[@id="dismissible"]/div/div[1]/a/h3'))).text
-
-            title_next = lang_det.pattern_search(title_next)
-            id_next = wait.until(EC.presence_of_element_located(
-                (By.XPATH, '//*[@id="dismissible"]/div/div[1]/a')))
-            next_video_url = id_next.get_attribute("href")
-            lang = lang_det.comp_languages(title_next, lang_choices)
-        if lang == lang_choices[0] or lang == lang_choices[1]:
-            accepted_dict = {title_next: next_video_url}
-            return accepted_dict
-        else:
-            self.crawl_next(next_video_url)
-
-
-
-
-
-
-
-
-
-        #
-
+        except WebDriverException as e:
+            print(f"An exception occurred with the WebDriver: {e}")
 

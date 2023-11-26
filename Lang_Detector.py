@@ -6,8 +6,8 @@ class LangDetect:
     pat_gr = re.compile(r'[α-ωΑ-Ωίϊΐόύϋΰέώ]{3}')
     pat_eng = re.compile(r'[a-zA-Z]')
     # Creating patterns that are written with English char, but they definitely have Greek meaning
-    pat_greeklish = re.compile(r'\b(gia|kai|ti|ta|tis|tous|tou|toys|oi|o|h|autos|auta|'
-                               r'oti|na|nai|oxi|den|tha|8a)\b', flags=re.IGNORECASE)
+    pat_greeklish = re.compile(r'\b(egw|esi|emeis|esy|eseis|afoy|mou|moy|sou|soy|afou|autoi|autes|aytoi|geia|apo|ton|'
+                               r'gia|kai|ti|ta|tis|tous|tou|toys|oi|o|h|autos|auta|oti|na|nai|oxi|den|tha|8a)\b', flags=re.IGNORECASE)
 
     def read_txt(self, txt):
         ls_sentences = []
