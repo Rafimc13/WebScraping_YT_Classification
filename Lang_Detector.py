@@ -2,7 +2,8 @@ import re
 
 
 class LangDetect:
-    # Separating the Greek/English/other languages. If we have at least 3 greek chars is a greek title-comment
+    """Separating the Greek/English/other languages. If we
+    have at least 3 greek chars is a greek title-comment"""
     pat_gr = re.compile(r'[α-ωΑ-Ωίϊΐόύϋΰέώ]{3}')
     pat_eng = re.compile(r'[a-zA-Z]')
     # Creating patterns that are written with English char, but they definitely have Greek meaning
@@ -10,6 +11,7 @@ class LangDetect:
                                r'gia|kai|ti|ta|tis|tous|tou|toys|oi|o|h|autos|auta|oti|na|nai|oxi|den|tha|8a)\b', flags=re.IGNORECASE)
 
     def read_txt(self, txt):
+        """Read a txt with sentences in order to start play"""
         ls_sentences = []
         with open(txt, 'r', encoding='utf-8') as file:
             for line in file:
@@ -19,6 +21,7 @@ class LangDetect:
         return ls_sentences
 
     def pattern_search(self, sentence, pattern=None):
+        """Clean my sentences from unnecessary staff"""
         if pattern is None:
             pattern = re.compile(r'\.\n|(\d{1,2}\. )')
         try:
@@ -29,6 +32,8 @@ class LangDetect:
         return sentence
 
     def comp_languages(self, sentence, languages):
+        """separate the sentences based on different languages
+        (Greek/Greeklish/English/other) """
         lang = None
         if re.search(self.pat_gr, sentence):
             lang = languages[0]
@@ -49,6 +54,7 @@ class LangDetect:
         return lang
 
     def comp_scores(self, dataset, column1, column2):
+        """Compare the accuracy of my language detector based on ground truth"""
         my_sum = 0
         for i in range(len(dataset)):
             if dataset.iloc[i][column1] == dataset.iloc[i][column2]:

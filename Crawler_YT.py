@@ -11,6 +11,13 @@ from selenium.webdriver.common.keys import Keys
 class Crawling_YT:
 
     def crawl_yt_title(self, url):
+        """With Edge as web driver i try to catch the title of the
+        video and its comments. I implement that by searching the element with
+         the correct XPATH for the title, and all the elements with the correct
+          XPATH for the comments.  I use an automation in order to scroll down, so the necessary
+          javascript code can be loaded smoothly. Moreover, I print if we have comments or not,
+          thus I know when we have any problem (with the exceptions). I run an if condition in
+          order to return a none value or the comments, title"""
         try:
             response = requests.get(url)
             if response.status_code == 200:
@@ -44,6 +51,11 @@ class Crawling_YT:
             print(f"An exception occurred with the WebDriver:\n No available comments!")
 
     def crawl_next(self, url):
+        """With Edge as web driver I try to find as many as possible recommended videos
+        in which the key will be the title and the value will be the link. I implement that by
+         searching all the elements with the correct XPATH for the title, and all the elements
+         with the correct XPATH for the link. I use an automation in order to scroll down,
+         so the necessary javascript code can be loaded smoothly"""
         my_dict = {}
         try:
             response = requests.get(url)
