@@ -3,3 +3,5 @@ jupyter
 scikit-learn
 selenium
 BeautifulSoup4
+langdetect
+matplotlib

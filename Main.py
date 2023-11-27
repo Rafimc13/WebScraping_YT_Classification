@@ -12,14 +12,8 @@ class Main:
     # Creating an instance of class Crawling_YT
     my_crawler = Crawling_YT()
 
-    def check_lang(self, video_titles, accepted_videos, lang_choices):
-
-
-        return accepted_videos
-
-
     # Reading a training dataset with sentences
-    txt_file = 'dataset_sentences.txt'
+    txt_file = 'exported_files\dataset_sentences.txt'
     ls_sentences = lang_det.read_txt(txt_file)
 
     # Lets clean our dataset with the unnecessary staff (numbers, dots, etc)
@@ -45,22 +39,26 @@ class Main:
         dataset_df.loc[sentence, 'language'] = lang_det.comp_languages(sentence, lang_choices)
 
     # Saving our dataframe in a .html and a .csv file with the name gold
-    dataset_df.to_html("gold.html")
-    dataset_df.to_csv('gold.csv')
+    dataset_df.to_html('exported_files\gold.html')
+    dataset_df.to_csv('exported_files\gold.csv')
 
     # Comparison of ground truth with my classification via regexps
     my_accuracy = lang_det.comp_scores(dataset_df, 'language', 'ground_truth')
 
     url_youtube = 'https://www.youtube.com/watch?v=b0z_dp5-luQ'
 
-    # Lets store 30 or more Greek/Greeklish titles and their posts
+    # Lets store 15 or more Greek/Greeklish titles and their comments
     accepted_videos = {}
-    title1, comments1 = my_crawler.crawl_yt_title(url_youtube)
-    accepted_videos[title1] = url_youtube
+    result1 = my_crawler.crawl_yt_title(url_youtube)
+    if result1 is not None:
+        title1, comments1 = result1
+        accepted_videos[title1] = url_youtube
+    else:
+        accepted_videos['My first video title'] = url_youtube
     check_next_videos = my_crawler.crawl_next(url_youtube)
     sum = 0
     loops = 0
-    while sum < 10:
+    while sum < 20:
         loops += 1
         for key, value in check_next_videos.items():
             title_lang = lang_det.comp_languages(key, lang_choices)
@@ -80,11 +78,14 @@ class Main:
     comments_df = comments_df.set_index('comment')
 
     for key, value in accepted_videos.items():
-        title, comments = my_crawler.crawl_yt_title(value)
-        for comment in comments:
-            comments_df.loc[comment] = value
+        result = my_crawler.crawl_yt_title(value)
+        if result is not None:
+            title, comments = result
+            for comment in comments:
+                comments_df.loc[comment] = value
 
-    comments_df.to_csv('crawl.csv')
+    comments_df.to_csv('exported_files\crawl.csv')
+    comments_df.to_html('exported_files\crawl.html')
 
 
 
