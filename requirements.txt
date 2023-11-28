@@ -5,3 +5,7 @@ selenium
 BeautifulSoup4
 langdetect
 matplotlib
+openai
+python-dotenv
+seaborn
+nltk
