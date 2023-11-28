@@ -1,7 +1,9 @@
 import pandas as pd
-import numpy as np
 import re
 import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer

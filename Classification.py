@@ -9,36 +9,61 @@ from sklearn.pipeline import make_pipeline
 from sklearn.metrics import accuracy_score
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 
 class ClassificationTrain:
 
-    @staticmethod
-    def classifier_predictions(model, model_name, X, y,):
+    def __init__(self):
+        self.model = None
+        self.model_name = None
+        self.model_preds = None
+    def classifier_predictions(self, model, model_name, X, y, X_test=None, y_test=None, X_train=None, y_train=None):
         """Use any classification (sci-kit) model in order to train it
         and predict for new unknown values. Moreover, by using train data
          we print the accuracy of each model"""
-        n_set = len(X)
-        split_set = int(0.5 * n_set)
-        test_indices = random.sample(range(n_set), n_set - split_set)
+        if X_test is None or X_train is None or y_train is None:
+            n_set = len(X)
+            split_set = int(0.5 * n_set)
+            test_indices = random.sample(range(n_set), n_set - split_set)
 
-        X_test = X.iloc[test_indices]
-        y_test = y.iloc[test_indices]
-        X_train = X.iloc[:split_set]
-        y_train = y.iloc[:split_set]
+            X_test = X.iloc[test_indices]
+            y_test = y.iloc[test_indices]
+            X_train = X.iloc[:split_set]
+            y_train = y.iloc[:split_set]
 
-        # Train our model
-        model.fit(X_train, y_train)
-        # Test our model
-        model_preds = model.predict(X_test)
+            # Train our model
+            model.fit(X_train, y_train)
+            # Test our model
+            model_preds = model.predict(X_test)
+        else:
+            X_test = X_test
+            y_test = y_test
+            X_train = X_train
+            y_train = y_train
+
+            # Train our model
+            model.fit(X_train, y_train)
+            # Test our model
+            model_preds = model.predict(X_test)
+
+            # Store the trained model and predictions in the instance variables
+            self.model = model
+            self.model_name = model_name
+            self.model_preds = model_preds
 
         # Evaluation of the model based on the test set y
-        print(f"{model_name} Accuracy: {accuracy_score(y_test, model_preds)}")
+        if y_test is not None:
+            print(f"{model_name} Accuracy: {accuracy_score(y_test, model_preds)}")
         return model, model_preds
 
+
+
+if __name__ == "__main__":
     # Creation of instance of class LangDetect
     lang_det = LangDetect()
+    # Creation of instance of class ClassificationTrain
+    clt = ClassificationTrain()
+
 
     # Creating my dataframe with the gold.csv
     sentences_df = pd.read_csv('exported_files\gold.csv')
@@ -69,9 +94,10 @@ class ClassificationTrain:
     svm_model = make_pipeline(CountVectorizer(), LinearSVC(dual=False))
     rf_model = make_pipeline(CountVectorizer(), RandomForestClassifier())
 
-    nb_model, nb_preds = classifier_predictions(nb_model, 'Naive Bayes model', X, y)
-    svm_model, svm_preds = classifier_predictions(svm_model, 'Support Vector Machines model', X, y)
-    rf_model, rf_preds = classifier_predictions(rf_model, 'Random Forests model', X, y)
+
+    nb_model, nb_preds = clt.classifier_predictions(nb_model, 'Naive Bayes model', X, y)
+    svm_model, svm_preds = clt.classifier_predictions(svm_model, 'Support Vector Machines model', X, y)
+    rf_model, rf_preds = clt.classifier_predictions(rf_model, 'Random Forests model', X, y)
 
     # Open the previous file 'crawl.csv' in order to predict with the best classifier
     comments_df = pd.read_csv('exported_files\crawl.csv')
@@ -98,8 +124,8 @@ class ClassificationTrain:
     # Scatter plot for each language
     for lang, color in zip(df_plot['Predicted Language'].unique(), ['r', 'g', 'b']):
         indices = df_plot['Predicted Language'] == lang
-        ax.scatter(df_plot.loc[indices, 'X'], df_plot.loc[indices, 'Y'], df_plot.loc[indices, 'Z'], c=color,
-                   label=lang)
+        ax.scatter(df_plot.loc[indices, 'X'], df_plot.loc[indices, 'Y'], df_plot.loc[indices, 'Z'], c=color,label=lang)
+
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
@@ -107,4 +133,3 @@ class ClassificationTrain:
     ax.view_init(elev=30, azim=-38)
 
     plt.show()
-
