@@ -134,6 +134,6 @@ if __name__ == "__main__":
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
     ax.legend()
-    ax.view_init(elev=17, azim=-84)
+    ax.view_init(elev=30, azim=-38)
 
     plt.show()

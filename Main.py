@@ -53,7 +53,7 @@ class Main:
     accepted_videos = {}
     result1 = my_crawler.crawl_yt_title(url_youtube) # It might not catch any comments thus I run an if condition
     if result1 is not None:
-        title1, comments1 = result1
+        title1, comments1, dates1 = result1
         accepted_videos[title1] = url_youtube
     else:
         accepted_videos['My first video title'] = url_youtube
@@ -74,16 +74,17 @@ class Main:
             check_next_videos = my_crawler.crawl_next(url_youtube)
 
     # Creating a dataframe in order to store our comments with their link
-    comments_df = pd.DataFrame(columns=['comment', 'link'])
+    comments_df = pd.DataFrame(columns=['comment', 'link', 'date'])
     comments_df = comments_df.set_index('comment')
 
     # Iterate the accepted link based on the title names and crawl their comments. Store them in the dataframe
     for key, value in accepted_videos.items():
         result = my_crawler.crawl_yt_title(value)
         if result is not None:
-            title, comments = result
-            for comment in comments:
-                comments_df.loc[comment] = value
+            title, comments, dates = result
+            for i in range(len(comments)):
+                comments_df.loc[comments[i], 'link'] = value
+                comments_df.loc[comments[i], 'date'] = dates[i]
 
     # Store the dataframe in a .csv and a .html file with the name 'crawl'
     comments_df.to_csv('exported_files\crawl.csv')

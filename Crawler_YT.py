@@ -30,15 +30,21 @@ class Crawling_YT:
                         EC.presence_of_element_located((By.XPATH, '//*[@id="title"]/h1/yt-formatted-string'))).text
                     for _ in range(5):
                         driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.END)
-                        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # ChatGPT line of code
                         time.sleep(2)
-                        comments = wait.until(EC.presence_of_all_elements_located((By.XPATH, '//*[@id="comment-content"]')))
+                        comments = wait.until(
+                            EC.presence_of_all_elements_located((By.XPATH, '//*[@id="comment-content"]')))
+                        dates = wait.until(EC.presence_of_all_elements_located(
+                            (By.XPATH, '//*[@id="header-author"]/yt-formatted-string')))
                     comment_list = []
+                    date_list = []
                     for comment in comments:
                         comment_list.append(comment.text)
+                    for date in dates:
+                        date_list.append(date.text)
+
                 if comment_list is not None:
                     print("Storing comments...")
-                    return title, comment_list
+                    return title, comment_list, date_list
                 else:
                     print('No comments. Error follows...')
                     return None
@@ -67,7 +73,6 @@ class Crawling_YT:
                     wait = WebDriverWait(driver, 15)
                     for _ in range(2):
                         driver.find_element(By.TAG_NAME, 'body').send_keys(Keys.END)
-                        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")  # ChatGPT line of code
                         time.sleep(2)
                         next_titles = wait.until(
                             EC.presence_of_all_elements_located((By.XPATH, '//*[@id="dismissible"]/div/div[1]/a/h3')))

@@ -25,8 +25,9 @@ class PromptingGPT:
     conversation_history = []
 
     def make_prompts(self, prompt):
-        """Combine previous messages with the current prompt and creating a thread
-        with gpt-3.5-turbo-1106"""
+
+
+        # Combine previous messages with the current prompt
         messages = [{'role': 'system', 'content': 'You are a helpful assistant.'}]
         for msg in self.conversation_history:
             messages.append({'role': 'user', 'content': msg})
@@ -35,8 +36,7 @@ class PromptingGPT:
 
         response = openai.chat.completions.create(
             model="gpt-3.5-turbo-1106",
-            messages=messages,
-            max_tokens=4000,
+            messages=messages
         )
 
         # Extract and print the model's reply
@@ -46,10 +46,8 @@ class PromptingGPT:
         # Update conversation history
         self.conversation_history.append(prompt)
         self.conversation_history.append(reply)
-        return reply
 
     def chat_prompts(self):
-        """Creation of a chat with GPT 3.5 turbo for chatting and fast Q&A"""
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
         ]
