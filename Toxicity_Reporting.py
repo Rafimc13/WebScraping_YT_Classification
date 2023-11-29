@@ -13,7 +13,7 @@ from GPT_Prompting import PromptingGPT
 class Generate_Toxicity:
 
     def combine_dict(self, df, dict1, dict2):
-        for key, value in my_dict1.items():
+        for key, value in dict1.items():
             dict1[key] = value + dict2[key]
 
         df.loc[dict1['class 1 (non-toxic)'], 'toxicity'] = 1
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     GPT_prompts = PromptingGPT()
     toxic = Generate_Toxicity()
 
-    df = pd.read_csv('exported_files/crawl.csv')
+    df = pd.read_csv('exported_files/crawl.csv', index_col=0)
     training_comments1 = df['comment'][:50].to_string()
     training_comments2 = df['comment'][50:80].to_string()
 
@@ -185,7 +185,6 @@ if __name__ == "__main__":
    "class 5 (fully toxic)": []
     }
 
-    #Combine the two training sets (dictionaries)
     combined_dict = toxic.combine_dict(df, my_dict1, my_dict2)
 
     my_classifier = clt()
@@ -213,6 +212,7 @@ if __name__ == "__main__":
     df['date'] = df['date'].apply(toxic.convert_greek_date)
     df['date'] = pd.to_datetime('now') - df['date']
     toxic.toxic_over_time(df, pages_set)
+
 
 
 

@@ -100,7 +100,7 @@ if __name__ == "__main__":
     rf_model, rf_preds = clt.classifier_predictions(rf_model, 'Random Forests model', X, y)
 
     # Open the previous file 'crawl.csv' in order to predict with the best classifier
-    comments_df = pd.read_csv('exported_files\crawl.csv')
+    comments_df = pd.read_csv('exported_files\crawl.csv', index_col=0)
 
     X_comments = comments_df['comment']
     X_comments = X_comments.fillna('')
